@@ -2,14 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import QuizResponse from '@/models/Response';
 
-// Type for route params
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-export async function POST(req: NextRequest, context: RouteContext) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectDB();
     const body = await req.json();
@@ -20,7 +16,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     }
 
     const existing = await QuizResponse.findOne({
-      quizId: context.params.id,
+      quizId: params.id,
       name: name.trim(),
       email: email.trim().toLowerCase(),
     });
@@ -30,7 +26,7 @@ export async function POST(req: NextRequest, context: RouteContext) {
     }
 
     const response = new QuizResponse({
-      quizId: context.params.id,
+      quizId: params.id,
       answers,
       name,
       email,
@@ -40,23 +36,26 @@ export async function POST(req: NextRequest, context: RouteContext) {
 
     await response.save();
     return NextResponse.json({ message: 'Response submitted successfully' });
-  } catch{
-    console.error('API Error:');
+  } catch (err) {
+    console.error('API Error:', err);
     return NextResponse.json({ error: 'Error submitting response' }, { status: 500 });
   }
 }
 
-export async function GET(req: NextRequest, context: RouteContext) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     await connectDB();
 
-    const responses = await QuizResponse.find({ quizId: context.params.id })
+    const responses = await QuizResponse.find({ quizId: params.id })
       .select('name email phone answers createdAt')
       .sort({ createdAt: -1 });
 
     return NextResponse.json(responses);
-  } catch{
-    console.error('Error fetching responses:');
+  } catch (err) {
+    console.error('Error fetching responses:', err);
     return NextResponse.json({ error: 'Failed to fetch responses' }, { status: 500 });
   }
 }

@@ -151,7 +151,7 @@ export default function ReviewQuizPage() {
               Type: {q.type === 'short-text' ? 'Short Text Answer' : 'Single Choice'}
             </p>
 
-            {q.type === 'single-choice' && q.options?.length > 0 && (
+            {q.type === 'single-choice' && Array.isArray(q.options) && q.options.length > 0 &&  (
               <div className="pl-4 space-y-1">
                 {q.options.map((opt, i) => (
                   <div key={i}>

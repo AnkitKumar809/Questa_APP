@@ -37,7 +37,7 @@ export async function PUT(req: Request, context: Context) {
     }
 
     return NextResponse.json(updatedQuiz);
-  } catch (err) {
+  } catch{
     return NextResponse.json({ error: 'Failed to update quiz' }, { status: 500 });
   }
 }
