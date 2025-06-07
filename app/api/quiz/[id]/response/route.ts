@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import QuizResponse from '@/models/Response';
+import mongoose from 'mongoose';
 
-// Define the correct context type for dynamic route parameters
-type RouteContext = {
+interface RouteContext {
   params: {
-    id: string;
+    id: mongoose.Schema.Types.ObjectId;
   };
-};
+}
 
-export async function POST(
-  req: NextRequest,
-  context: RouteContext
-) {
+export async function POST(req: NextRequest, context: RouteContext) {
   try {
     await connectDB();
     const body = await req.json();
@@ -43,28 +40,23 @@ export async function POST(
 
     await response.save();
     return NextResponse.json({ message: 'Response submitted successfully' });
-  } catch (err) {
-    console.error('API Error:', err);
+  } catch{
+    console.error('API Error:');
     return NextResponse.json({ error: 'Error submitting response' }, { status: 500 });
   }
 }
 
-export async function GET(
-  req: NextRequest,
-  context: RouteContext
-) {
+export async function GET(req: NextRequest, context: RouteContext) {
   try {
     await connectDB();
 
-    const quizId = context.params.id;
-
-    const responses = await QuizResponse.find({ quizId })
+    const responses = await QuizResponse.find({ quizId: context.params.id })
       .select('name email phone answers createdAt')
       .sort({ createdAt: -1 });
 
     return NextResponse.json(responses);
-  } catch (err) {
-    console.error('Error fetching responses:', err);
+  } catch{
+    console.error('Error fetching responses:');
     return NextResponse.json({ error: 'Failed to fetch responses' }, { status: 500 });
   }
 }
