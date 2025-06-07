@@ -32,7 +32,7 @@ export default function ReviewQuizPage() {
           setQuiz(data);
           setUpdatedQuiz(JSON.parse(JSON.stringify(data))); // deep clone for editing
         }
-      } catch (err) {
+      } catch{
         setError('Failed to load quiz.');
       }
     }
@@ -78,7 +78,7 @@ export default function ReviewQuizPage() {
       setQuiz(data);
       setUpdatedQuiz(JSON.parse(JSON.stringify(data))); // keep updatedQuiz in sync with saved quiz
       setEditMode(false);
-    } catch (err) {
+    } catch{
       alert('Error saving quiz');
     } finally {
       setSaving(false);
