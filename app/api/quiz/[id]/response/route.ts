@@ -2,9 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import QuizResponse from '@/models/Response';
 
+// Define the correct context type for dynamic route parameters
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
     await connectDB();
@@ -16,7 +23,7 @@ export async function POST(
     }
 
     const existing = await QuizResponse.findOne({
-      quizId: params.id,
+      quizId: context.params.id,
       name: name.trim(),
       email: email.trim().toLowerCase(),
     });
@@ -26,7 +33,7 @@ export async function POST(
     }
 
     const response = new QuizResponse({
-      quizId: params.id,
+      quizId: context.params.id,
       answers,
       name,
       email,
@@ -44,12 +51,14 @@ export async function POST(
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: RouteContext
 ) {
   try {
     await connectDB();
 
-    const responses = await QuizResponse.find({ quizId: params.id })
+    const quizId = context.params.id;
+
+    const responses = await QuizResponse.find({ quizId })
       .select('name email phone answers createdAt')
       .sort({ createdAt: -1 });
 
